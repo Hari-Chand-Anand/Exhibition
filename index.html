@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>QR Code Machine Information System</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f2f2f7;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --footer: #aeaeb2;
+      --hero-start: #1c2b4a;
+      --hero-end: #0d1a35;
+      --hero-label: rgba(255, 255, 255, 0.72);
+      --blue: #0071e3;
+      --blue-bg: #e8f1fb;
+      --red: #ff3b30;
+      --red-bg: #ffeaea;
+      --green: #25d366;
+      --green-bg: #e4f7ec;
+      --shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+      --card-border: rgba(0, 0, 0, 0.04);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1e;
+        --card-bg: rgba(44, 44, 46, 0.92);
+        --text: #f5f5f7;
+        --muted: #98989f;
+        --footer: #8e8e93;
+        --hero-start: #1c2b4a;
+        --hero-end: #0d1a35;
+        --blue-bg: #1a2d42;
+        --red-bg: #3a1a1a;
+        --green-bg: #1a3329;
+        --card-border: rgba(255, 255, 255, 0.05);
+        --shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      padding: 18px 16px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 22px 20px 24px;
+      border-radius: 28px;
+      background: linear-gradient(160deg, var(--hero-start) 0%, var(--hero-end) 100%);
+      box-shadow: 0 12px 34px rgba(8, 20, 46, 0.28);
+      isolation: isolate;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(8px);
+      opacity: 0.6;
+    }
+
+    .hero::before {
+      top: -72px;
+      left: -58px;
+      background: radial-gradient(
+        circle,
+        rgba(86, 162, 255, 0.34) 0%,
+        rgba(86, 162, 255, 0.12) 38%,
+        rgba(86, 162, 255, 0) 72%
+      );
+    }
+
+    .hero::after {
+      right: -68px;
+      bottom: -82px;
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(129, 177, 255, 0.14) 35%,
+        rgba(129, 177, 255, 0) 70%
+      );
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .hero-label {
+      margin: 0;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--hero-label);
+      padding-top: 1px;
+    }
+
+    .hero-logo {
+      width: auto;
+      height: 28px;
+      max-width: 112px;
+      object-fit: contain;
+      display: block;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 6px 10px;
+      opacity: 1;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+    }
+
+    .hero-title {
+      margin: 0;
+      color: #ffffff;
+      font-size: 28px;
+      line-height: 1.18;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      max-width: 90%;
+    }
+
+    .section-label {
+      margin: 2px 4px 0;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      width: 100%;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.22s ease, opacity 0.45s ease, translate 0.45s ease;
+      opacity: 0;
+      translate: 0 16px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .card.visible {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    .card:active {
+      transform: scale(0.975);
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-icon svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+
+    .icon-blue {
+      background: var(--blue-bg);
+      color: var(--blue);
+    }
+
+    .icon-red {
+      background: var(--red-bg);
+      color: var(--red);
+    }
+
+    .icon-green {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .card-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .card-title {
+      margin: 0 0 4px;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-desc {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+
+    .card-arrow {
+      flex-shrink: 0;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-arrow svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .footer {
+      margin-top: auto;
+      padding-top: 8px;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--footer);
+    }
+
+    button {
+      border: none;
+      font: inherit;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero" aria-label="Machine hero section">
+      <div class="hero-top">
+        <img class="hero-logo" id="companyLogo" alt="HCA logo" />
+        <p class="hero-label">Machine</p>
+      </div>
+      <h1 class="hero-title" id="machineName">Machine Name</h1>
+    </section>
+
+    <section aria-label="Quick access links">
+      <p class="section-label">Quick Access</p>
+
+      <div class="cards">
+        <button class="card" type="button" data-url="catalog">
+          <span class="card-icon icon-blue" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M8 4.75h5.2c.4 0 .78.16 1.06.44l3.55 3.55c.28.28.44.66.44 1.06V18.5A1.75 1.75 0 0 1 16.5 20.25h-8A1.75 1.75 0 0 1 6.75 18.5v-12A1.75 1.75 0 0 1 8.5 4.75Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M13 4.75V8.5c0 .41.34.75.75.75h3.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.5 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M9.5 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="card-copy">
+            <p class="card-title">Machine Catalog</p>
+            <p class="card-desc">Technical docs &amp; specifications</p>
+          </span>
+          <span class="card-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+
+        <button class="card" type="button" data-url="youtube">
+          <span class="card-icon icon-red" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M20.54 7.23c-.2-.76-.8-1.36-1.56-1.57C17.57 5.25 12 5.25 12 5.25s-5.57 0-6.98.41c-.76.2-1.36.8-1.56 1.57C3.05 8.63 3.05 12 3.05 12s0 3.37.41 4.77c.2.76.8 1.36 1.56 1.57 1.41.41 6.98.41 6.98.41s5.57 0 6.98-.41c.76-.2 1.36-.8 1.56-1.57.41-1.4.41-4.77.41-4.77s0-3.37-.41-4.77Z" fill="currentColor"/>
+              <path d="m10.25 15.37 4.62-2.67-4.62-2.67v5.34Z" fill="#fff"/>
+            </svg>
+          </span>
+          <span class="card-copy">
+            <p class="card-title">YouTube Video</p>
+            <p class="card-desc">Demo &amp; operation instructions</p>
+          </span>
+          <span class="card-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+
+        <button class="card" type="button" data-url="whatsapp">
+          <span class="card-icon icon-green" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 4a7.95 7.95 0 0 0-6.86 12L4 20l4.16-1.1A7.95 7.95 0 1 0 12 4Z" fill="currentColor"/>
+              <path d="M9.55 8.75c-.2-.45-.42-.46-.62-.47h-.52c-.18 0-.47.07-.72.34-.25.27-.95.93-.95 2.27s.98 2.64 1.12 2.82c.13.18 1.9 3.04 4.7 4.14 2.32.92 2.8.74 3.31.69.5-.05 1.62-.66 1.85-1.3.23-.65.23-1.2.16-1.31-.07-.11-.25-.18-.52-.32s-1.62-.8-1.86-.9c-.25-.09-.43-.14-.61.14-.18.27-.7.9-.86 1.08-.16.18-.31.2-.58.07-.27-.14-1.14-.42-2.16-1.34-.8-.71-1.34-1.58-1.5-1.84-.16-.27-.02-.41.12-.55.12-.12.27-.31.4-.47.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.47-.07-.14-.61-1.58-.86-2.12Z" fill="#fff"/>
+            </svg>
+          </span>
+          <span class="card-copy">
+            <p class="card-title">Contact Us</p>
+            <p class="card-desc">WhatsApp support team instantly</p>
+          </span>
+          <span class="card-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Scan QR code to access this page • Powered by QR Manager
+    </footer>
+  </main>
+
+  <script>
+    const MACHINES = {
+      "cnc-milling": {
+        machineName: "CNC Milling Machine",
+        catalogLink: "https://drive.google.com/file/d/YOUR_FILE_ID_1/preview",
+        youtubeLink: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_1",
+        whatsappLink: "https://wa.me/91XXXXXXXXXX?text=Support+needed+for+CNC+Milling+Machine",
+        companyLogo: "https://www.grouphca.com/cdn/shop/files/logo_1_280x.png?v=1722238275",
+      },
+      "dy3020": {
+        machineName: "DY3020 Machine",
+        catalogLink: "https://drive.google.com/file/d/YOUR_FILE_ID_2/preview",
+        youtubeLink: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_2",
+        whatsappLink: "https://wa.me/91XXXXXXXXXX?text=Support+needed+for+DY3020+Machine",
+        companyLogo: "https://www.grouphca.com/cdn/shop/files/logo_1_280x.png?v=1722238275",
+      },
+      "jzq-630k": {
+        machineName: "JZQ-630K",
+        catalogLink: "https://drive.google.com/file/d/YOUR_FILE_ID_3/preview",
+        youtubeLink: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_3",
+        whatsappLink: "https://wa.me/91XXXXXXXXXX?text=Support+needed+for+JZQ-630K",
+        companyLogo: "https://www.grouphca.com/cdn/shop/files/logo_1_280x.png?v=1722238275",
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const machineId = (params.get('id') || 'cnc-milling').trim().toLowerCase();
+    const MACHINE = MACHINES[machineId] || MACHINES['cnc-milling'];
+
+    const linkMap = {
+      catalog: MACHINE.catalogLink,
+      youtube: MACHINE.youtubeLink,
+      whatsapp: MACHINE.whatsappLink,
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const machineNameEl = document.getElementById('machineName');
+      const companyLogoEl = document.getElementById('companyLogo');
+      const cards = document.querySelectorAll('.card');
+
+      machineNameEl.textContent = MACHINE.machineName;
+      document.title = `${MACHINE.machineName} • QR Machine Info`;
+
+      if (companyLogoEl && MACHINE.companyLogo) {
+        companyLogoEl.src = MACHINE.companyLogo.startsWith('//')
+          ? `https:${MACHINE.companyLogo}`
+          : MACHINE.companyLogo;
+      }
+
+      cards.forEach((card, index) => {
+        const type = card.dataset.url;
+        const url = linkMap[type];
+
+        card.addEventListener('click', () => {
+          if (url) {
+            window.open(url, '_blank');
+          }
+        });
+
+        setTimeout(() => {
+          card.classList.add('visible');
+        }, 120 + index * 70);
+      });
+    });
+  </script>
+</body>
+</html>
