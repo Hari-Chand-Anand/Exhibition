@@ -375,7 +375,7 @@
         machineName: "DY3020 Machine",
         catalogLink: "https://drive.google.com/file/d/YOUR_FILE_ID_2/preview",
         youtubeLink: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_2",
-        whatsappLink: "https://wa.me/91XXXXXXXXXX?text=Support+needed+for+DY3020+Machine",
+        whatsappLink: "https://wa.me/91XXXXXXXXXX?text=I+needed+for+DY3020+Machine",
         companyLogo: "https://www.grouphca.com/cdn/shop/files/logo_1_280x.png?v=1722238275",
       },
       "jzq-630k": {
@@ -388,8 +388,8 @@
     };
 
     const params = new URLSearchParams(window.location.search);
-    const machineId = (params.get('id') || 'cnc-milling').trim().toLowerCase();
-    const MACHINE = MACHINES[machineId] || MACHINES['cnc-milling'];
+    const machineId = (params.get('id') || 'DY-R9').trim().toLowerCase();
+    const MACHINE = MACHINES[machineId] || MACHINES['DY-R9'];
 
     const linkMap = {
       catalog: MACHINE.catalogLink,
