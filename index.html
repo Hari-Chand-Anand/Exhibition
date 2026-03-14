@@ -677,45 +677,54 @@
 
     };
 
-    const params = new URLSearchParams(window.location.search);
-    const machineId = (params.get('id') || 'DY-R9').trim().toLowerCase();
-    const MACHINE = MACHINES[machineId] || MACHINES['DY-R9'];
+   const normalizeId = (value) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
-    const linkMap = {
-      catalog: MACHINE.catalogLink,
-      youtube: MACHINE.youtubeLink,
-      whatsapp: MACHINE.whatsappLink,
-    };
+  const MACHINE_LOOKUP = Object.fromEntries(
+    Object.entries(MACHINES).map(([key, value]) => [normalizeId(key), value])
+  );
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const machineNameEl = document.getElementById('machineName');
-      const companyLogoEl = document.getElementById('companyLogo');
-      const cards = document.querySelectorAll('.card');
+  const params = new URLSearchParams(window.location.search);
+  const machineId = normalizeId(params.get("id") || "DY-R9");
+  const MACHINE = MACHINE_LOOKUP[machineId] || MACHINE_LOOKUP["dy-r9"];
 
-      machineNameEl.textContent = MACHINE.machineName;
-      document.title = `${MACHINE.machineName} • QR Machine Info`;
+  const linkMap = {
+    catalog: MACHINE.catalogLink,
+    youtube: MACHINE.youtubeLink,
+    whatsapp: MACHINE.whatsappLink,
+  };
 
-      if (companyLogoEl && MACHINE.companyLogo) {
-        companyLogoEl.src = MACHINE.companyLogo.startsWith('//')
-          ? `https:${MACHINE.companyLogo}`
-          : MACHINE.companyLogo;
-      }
+  window.addEventListener("DOMContentLoaded", () => {
+    const machineNameEl = document.getElementById("machineName");
+    const companyLogoEl = document.getElementById("companyLogo");
+    const cards = document.querySelectorAll(".card");
 
-      cards.forEach((card, index) => {
-        const type = card.dataset.url;
-        const url = linkMap[type];
+    machineNameEl.textContent = MACHINE.machineName;
+    document.title = `${MACHINE.machineName} • QR Machine Info`;
 
-        card.addEventListener('click', () => {
-          if (url) {
-            window.open(url, '_blank');
-          }
-        });
+    if (companyLogoEl && MACHINE.companyLogo) {
+      companyLogoEl.src = MACHINE.companyLogo.startsWith("//")
+        ? `https:${MACHINE.companyLogo}`
+        : MACHINE.companyLogo;
+    }
 
-        setTimeout(() => {
-          card.classList.add('visible');
-        }, 120 + index * 70);
+    cards.forEach((card, index) => {
+      const type = card.dataset.url;
+      const url = linkMap[type];
+
+      card.addEventListener("click", () => {
+        if (url) window.open(url, "_blank");
       });
+
+      setTimeout(() => {
+        card.classList.add("visible");
+      }, 120 + index * 70);
     });
-  </script>
+  });
+</script>
 </body>
 </html>
